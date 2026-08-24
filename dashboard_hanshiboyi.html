@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客服表现数据看板 - 瀚什博壹 - 5-7月</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#333}
+.container{max-width:1440px;margin:0 auto;padding:24px}
+.header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:white;padding:32px 40px;border-radius:16px;margin-bottom:24px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-50%;right:-10%;width:300px;height:300px;background:radial-gradient(circle,rgba(102,126,234,0.3) 0%,transparent 70%)}
+.header h1{font-size:28px;font-weight:700;margin-bottom:8px;position:relative}
+.header p{opacity:0.8;font-size:14px;position:relative}
+.header .update-time{position:absolute;right:40px;top:50%;transform:translateY(-50%);text-align:right;font-size:13px;opacity:0.7}
+.section{background:white;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.section-title{font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:20px;padding-left:12px;border-left:4px solid #667eea}
+.section-note{font-size:12px;color:#999;margin-bottom:16px}
+.summary-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.card-title{font-size:13px;color:#888;margin-bottom:8px}
+.card-value{font-size:26px;font-weight:700;color:#1a1a2e}
+.card-change{font-size:12px;margin-top:6px}
+.card-change.up{color:#52c41a}
+.card-change.down{color:#ff4d4f}
+.comparison-table{width:100%;border-collapse:collapse;font-size:14px;table-layout:auto}
+.comparison-table th{background:#f7f8fa;padding:12px;text-align:center;font-weight:600;color:#555;border-bottom:2px solid #e8e8e8;white-space:nowrap;min-width:100px}
+.comparison-table th:first-child{text-align:left;min-width:180px}
+.comparison-table td{padding:10px 12px;border-bottom:1px solid #f0f0f0;white-space:nowrap}
+.comparison-table td:first-child{text-align:left;font-weight:500;color:#333}
+.comparison-table tr:hover td{background:#fafbfe}
+.comparison-table .highlight{font-weight:700;color:#1a1a2e}
+.comparison-table .num{text-align:center;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:500}
+.badge-excellent{background:#e6f7e6;color:#52c41a}
+.badge-good{background:#e6f4ff;color:#1677ff}
+.badge-warning{background:#fff7e6;color:#fa8c16}
+.badge-danger{background:#fff1f0;color:#ff4d4f}
+.badge-neutral{background:#f5f5f5;color:#888}
+.comparison-section{background:white;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.comparison-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.comparison-select{padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;background:white}
+.comparison-btn{padding:8px 20px;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+.comparison-btn:hover{background:#5a6fd6}
+.comparison-radar-container{max-width:500px;margin:0 auto}
+.comparison-legend{display:flex;justify-content:center;gap:24px;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:13px}
+.legend-color{width:14px;height:14px;border-radius:3px}
+.diff-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+.diff-table th{background:#f7f8fa;padding:8px 10px;text-align:left;border-bottom:2px solid #e8e8e8}
+.diff-table td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table-wrap .comparison-table{min-width:720px}
+.footer{text-align:center;color:#999;font-size:12px;padding:16px 0 32px}
+.radar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.radar-card{background:#fafbfe;border:1px solid #f0f0f0;border-radius:10px;padding:16px}
+.radar-card h4{text-align:center;font-size:15px;margin-bottom:8px;color:#1a1a2e}
+.radar-card canvas{width:100%!important;height:100%!important}
+@media(max-width:768px){.container{padding:12px}.header{padding:24px 20px}.header h1{font-size:22px}.comparison-table{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>客服表现数据看板</h1>
+<p>5-7月客服接待与响应表现汇总（乐聊Metabase客户健康指标）</p>
+<div class="update-time">
+<div>数据更新：2026-08-24</div>
+<div>客户：瀚什博壹</div>
+</div>
+</div>
+
+<!-- Summary Cards -->
+<div class="summary-cards">
+<div class="card"><div class="card-title">7月接待买家数</div><div class="card-value">2,160</div><div class="card-change down">↓ 7.0% vs 6月</div></div>
+<div class="card"><div class="card-title">7月接待转化率</div><div class="card-value">18.10%</div><div class="card-change down">↓ 2.7% vs 6月</div></div>
+<div class="card"><div class="card-title">7月订单数</div><div class="card-value">65,605</div><div class="card-change down">↓ 18.9% vs 6月</div></div>
+<div class="card"><div class="card-title">7月人工平均响应时长</div><div class="card-value">02:49:34</div><div class="card-change up">↓ 改善 vs 6月</div></div>
+<div class="card"><div class="card-title">7月人工5分钟响应率</div><div class="card-value">28.31%</div><div class="card-change up">↑ 1.2pp vs 6月</div></div>
+</div>
+
+<!-- 5-7月核心指标对比 -->
+<div class="section">
+<div class="section-title">5-7月核心指标对比（售前看板）</div>
+<p class="section-note">口径：售前看板汇总行（全组织，买家去重）</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>趋势</th></tr></thead>
+<tbody>
+<tr><td>接待买家数</td><td class="num highlight">2,414</td><td class="num">2,323</td><td class="num">2,160</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>接待后下单买家数</td><td class="num highlight">496</td><td class="num">432</td><td class="num">391</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>接待后下单金额</td><td class="num highlight">¥26,631</td><td class="num">¥21,634</td><td class="num">¥23,053</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>接待转化率</td><td class="num highlight">20.55%</td><td class="num">18.60%</td><td class="num">18.10%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>机器人接待买家数</td><td class="num highlight">1,644</td><td class="num">1,534</td><td class="num">1,549</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>人工接待买家数</td><td class="num">770</td><td class="num">789</td><td class="num highlight">611</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>响应买家问题数</td><td class="num">3,401</td><td class="num highlight">4,736</td><td class="num">2,533</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>人工平均响应时长</td><td class="num">04:02:14</td><td class="num highlight">03:06:44</td><td class="num">02:49:34</td><td><span class="badge badge-excellent">持续改善</span></td></tr>
+<tr><td>人工1分钟响应率</td><td class="num">10.00%</td><td class="num">12.48%</td><td class="num highlight">13.62%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工5分钟响应率</td><td class="num">22.43%</td><td class="num">27.13%</td><td class="num highlight">28.31%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工30分钟响应率</td><td class="num">43.34%</td><td class="num">46.30%</td><td class="num highlight">51.64%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工60分钟响应率</td><td class="num">52.19%</td><td class="num">56.21%</td><td class="num highlight">60.99%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>买家5分钟被接待率</td><td class="num highlight">-</td><td class="num">-</td><td class="num">-</td><td><span class="badge badge-neutral">-</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 行业标杆对比 -->
+<div class="section">
+<div class="section-title">客服账号 vs 行业标杆（7月）</div>
+<p class="section-note">口径：客服维度数据；行业标杆为客服绩效数据中各指标的最优值</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>瀚什博壹（整体）</th><th>行业标杆</th></tr></thead>
+<tbody>
+<tr><td>人工1分钟响应率</td><td class="num">13.62%</td><td class="num highlight">95.00%</td></tr>
+<tr><td>人工5分钟响应率</td><td class="num">28.31%</td><td class="num highlight">99.97%</td></tr>
+<tr><td>人工平均响应时长</td><td class="num">02:49:34</td><td class="num highlight">25s</td></tr>
+<tr><td>买家咨询平均等待时长</td><td class="num">-</td><td class="num highlight">53s</td></tr>
+<tr><td>买家咨询1分钟被接待率</td><td class="num">-</td><td class="num highlight">93.17%</td></tr>
+<tr><td>买家咨询5分钟被接待率</td><td class="num">-</td><td class="num highlight">99.25%</td></tr>
+<tr><td>人工接待后下单转化率</td><td class="num">-</td><td class="num highlight">9.20%</td></tr>
+<tr><td>人工响应买家数</td><td class="num">2,533</td><td class="num highlight">19,512</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 订单与弃单 -->
+<div class="section">
+<div class="section-title">订单与弃单指标对比（5-7月）</div>
+<p class="section-note">口径：订单表、弃单表汇总数据</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>趋势</th></tr></thead>
+<tbody>
+<tr><td>总订单数</td><td class="num highlight">110,039</td><td class="num">80,986</td><td class="num">65,605</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>订单金额(人民币)</td><td class="num highlight">¥309.9万</td><td class="num">¥251.0万</td><td class="num">¥195.9万</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>非COD订单数</td><td class="num highlight">25,785</td><td class="num">22,971</td><td class="num">20,825</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>非COD付款率</td><td class="num highlight">95.11%</td><td class="num">95.28%</td><td class="num">94.64%</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>确认订单数</td><td class="num highlight">77,140</td><td class="num">52,060</td><td class="num">37,741</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>确认后弃单数</td><td class="num highlight">8,641</td><td class="num">6,787</td><td class="num">4,057</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>物流呵护覆盖率</td><td class="num">95.88%</td><td class="num">94.36%</td><td class="num highlight">93.93%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">取消订单（主要弃单类型）</td></tr>
+<tr><td>&nbsp;&nbsp;弃单数</td><td class="num highlight">-</td><td class="num">-</td><td class="num">-</td><td><span class="badge badge-neutral">-</span></td></tr>
+<tr><td>&nbsp;&nbsp;最终弃单率</td><td class="num highlight">-</td><td class="num">-</td><td class="num">-</td><td><span class="badge badge-neutral">-</span></td></tr>
+<tr><td>&nbsp;&nbsp;弃单挽回率</td><td class="num highlight">-</td><td class="num">-</td><td class="num">-</td><td><span class="badge badge-neutral">-</span></td></tr>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">仅退款</td></tr>
+<tr><td>&nbsp;&nbsp;弃单数</td><td class="num">204</td><td class="num highlight">227</td><td class="num">145</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;最终弃单率</td><td class="num highlight">0.13%</td><td class="num">0.21%</td><td class="num">0.15%</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;弃单沟通率</td><td class="num highlight">62.75%</td><td class="num">64.32%</td><td class="num">57.93%</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;沟通后挽回率</td><td class="num highlight">30.47%</td><td class="num">21.23%</td><td class="num">25.00%</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">退货/退款</td></tr>
+<tr><td>&nbsp;&nbsp;弃单数</td><td class="num highlight">-</td><td class="num">-</td><td class="num">-</td><td><span class="badge badge-neutral">-</span></td></tr>
+<tr><td>&nbsp;&nbsp;最终弃单率</td><td class="num highlight">-</td><td class="num">-</td><td class="num">-</td><td><span class="badge badge-neutral">-</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 非COD催付 -->
+<div class="section">
+<div class="section-title">非COD催付情况（5-7月）</div>
+<p class="section-note">口径：催付款配置的执行时间对应数据</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>趋势</th></tr></thead>
+<tbody>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">2分钟执行时间</td></tr>
+<tr><td>&nbsp;&nbsp;未付款订单数</td><td class="num highlight">1,732</td><td class="num">1,488</td><td class="num">1,451</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>&nbsp;&nbsp;催付后付款率</td><td class="num highlight">51.93%</td><td class="num">53.72%</td><td class="num">49.88%</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;催付覆盖率</td><td class="num highlight">91.40%</td><td class="num">90.32%</td><td class="num">86.49%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">催付款店铺开启情况</td></tr>
+<tr><td>&nbsp;&nbsp;LAZADA ID 店铺数</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td><span class="badge badge-neutral">未开启</span></td></tr>
+<tr><td>&nbsp;&nbsp;LAZADA PH 店铺数</td><td class="num">6/6</td><td class="num">6/6</td><td class="num">6/6</td><td><span class="badge badge-excellent">100%开启</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 响应时长详细 -->
+<div class="section">
+<div class="section-title">响应时长详细数据（5-7月 · 响应时长看板）</div>
+<p class="section-note">口径：响应时长看板（按买家问题数统计）</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>趋势</th></tr></thead>
+<tbody>
+<tr><td>响应买家问题数</td><td class="num">3,401</td><td class="num highlight">4,736</td><td class="num">2,533</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>人工平均响应时长</td><td class="num">04:02:14</td><td class="num">03:06:44</td><td class="num highlight">02:49:34</td><td><span class="badge badge-excellent">持续改善</span></td></tr>
+<tr><td>人工1分钟响应率</td><td class="num">10.00%</td><td class="num">12.48%</td><td class="num highlight">13.62%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工5分钟响应率</td><td class="num">22.43%</td><td class="num">27.13%</td><td class="num highlight">28.31%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工30分钟响应率</td><td class="num">43.34%</td><td class="num">46.30%</td><td class="num highlight">51.64%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工60分钟响应率</td><td class="num">52.19%</td><td class="num">56.21%</td><td class="num highlight">60.99%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 人工客服乐聊使用 -->
+<div class="section">
+<div class="section-title">人工客服乐聊使用情况</div>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th></tr></thead>
+<tbody>
+<tr><td>乐聊接待买家数</td><td class="num">602 (ID)</td><td class="num">639 (ID)</td><td class="num">522 (ID)</td></tr>
+<tr><td>非乐聊接待买家数</td><td class="num">7</td><td class="num">61</td><td class="num">2</td></tr>
+<tr><td>非乐聊占比</td><td class="num highlight">1.15%</td><td class="num">8.71%</td><td class="num highlight">0.38%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="footer">数据来源：乐聊Metabase客服健康指标仪表盘 · 客户：瀚什博壹 · 更新时间 2026-08-24</div>
+</div>
+
+</body>
+</html>
