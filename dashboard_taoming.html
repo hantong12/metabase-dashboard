@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客服表现数据看板 - 韬鸣 - 5-7月</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#333}
+.container{max-width:1440px;margin:0 auto;padding:24px}
+.header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:white;padding:32px 40px;border-radius:16px;margin-bottom:24px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-50%;right:-10%;width:300px;height:300px;background:radial-gradient(circle,rgba(102,126,234,0.3) 0%,transparent 70%)}
+.header h1{font-size:28px;font-weight:700;margin-bottom:8px;position:relative}
+.header p{opacity:0.8;font-size:14px;position:relative}
+.header .update-time{position:absolute;right:40px;top:50%;transform:translateY(-50%);text-align:right;font-size:13px;opacity:0.7}
+.section{background:white;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.section-title{font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:20px;padding-left:12px;border-left:4px solid #667eea}
+.section-note{font-size:12px;color:#999;margin-bottom:16px}
+.summary-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.card-title{font-size:13px;color:#888;margin-bottom:8px}
+.card-value{font-size:26px;font-weight:700;color:#1a1a2e}
+.card-change{font-size:12px;margin-top:6px}
+.card-change.up{color:#52c41a}
+.card-change.down{color:#ff4d4f}
+.comparison-table{width:100%;border-collapse:collapse;font-size:14px}
+.comparison-table th{background:#f7f8fa;padding:12px;text-align:center;font-weight:600;color:#555;border-bottom:2px solid #e8e8e8;white-space:nowrap}
+.comparison-table th:first-child{text-align:left}
+.comparison-table td{padding:10px 12px;border-bottom:1px solid #f0f0f0}
+.comparison-table tr:hover td{background:#fafbfe}
+.comparison-table .highlight{font-weight:700;color:#1a1a2e}
+.comparison-table .num{text-align:center;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:500}
+.badge-excellent{background:#e6f7e6;color:#52c41a}
+.badge-good{background:#e6f4ff;color:#1677ff}
+.badge-warning{background:#fff7e6;color:#fa8c16}
+.badge-danger{background:#fff1f0;color:#ff4d4f}
+.badge-neutral{background:#f5f5f5;color:#888}
+.radar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.radar-card{background:#fafbfe;border:1px solid #f0f0f0;border-radius:10px;padding:16px}
+.radar-card h4{text-align:center;font-size:15px;margin-bottom:8px;color:#1a1a2e}
+.radar-card canvas{width:100%!important;height:100%!important}
+.comparison-section{background:white;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.comparison-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.comparison-select{padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;background:white}
+.comparison-btn{padding:8px 20px;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+.comparison-btn:hover{background:#5a6fd6}
+.comparison-radar-container{max-width:500px;margin:0 auto}
+.comparison-legend{display:flex;justify-content:center;gap:24px;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:13px}
+.legend-color{width:14px;height:14px;border-radius:3px}
+.diff-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+.diff-table th{background:#f7f8fa;padding:8px 10px;text-align:left;border-bottom:2px solid #e8e8e8}
+.diff-table td{padding:7px 10px;border-bottom:1px solid #f0f0f0}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.table-wrap .comparison-table{min-width:720px}
+.footer{text-align:center;color:#999;font-size:12px;padding:16px 0 32px}
+@media(max-width:768px){.container{padding:12px}.header{padding:24px 20px}.header h1{font-size:22px}.comparison-table{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>客服表现数据看板</h1>
+<p>5-7月客服接待与响应表现汇总（乐聊Metabase客户健康指标）</p>
+<div class="update-time">
+<div>数据更新：2026-08-24</div>
+<div>客户：韬鸣</div>
+</div>
+</div>
+
+<!-- Summary Cards -->
+<div class="summary-cards">
+<div class="card"><div class="card-title">7月接待买家数</div><div class="card-value">13,086</div><div class="card-change up">↑ 14.7% vs 6月</div></div>
+<div class="card"><div class="card-title">7月接待转化率</div><div class="card-value">17.39%</div><div class="card-change up">↑ 4.4% vs 6月</div></div>
+<div class="card"><div class="card-title">7月订单数</div><div class="card-value">266,566</div><div class="card-change up">↑ 19.7% vs 6月</div></div>
+<div class="card"><div class="card-title">7月人工平均响应时长</div><div class="card-value">00:20:23</div><div class="card-change up">↓ 改善 vs 6月</div></div>
+<div class="card"><div class="card-title">7月人工5分钟响应率</div><div class="card-value">49.83%</div><div class="card-change down">↓ 0.40pp vs 6月</div></div>
+</div>
+
+<!-- 5-7月核心指标对比 -->
+<div class="section">
+<div class="section-title">5-7月核心指标对比</div>
+<p class="section-note">口径：售前表汇总行（全组织，买家去重），响应指标来自响应表</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>趋势</th></tr></thead>
+<tbody>
+<tr><td>接待买家数</td><td class="num">11,571</td><td class="num">11,410</td><td class="num highlight">13,086</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>接待后下单买家数</td><td class="num">1,887</td><td class="num">1,900</td><td class="num highlight">2,276</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>接待后下单金额</td><td class="num">¥13.66万</td><td class="num">¥11.97万</td><td class="num highlight">¥14.78万</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>接待转化率</td><td class="num">16.31%</td><td class="num">16.65%</td><td class="num highlight">17.39%</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>机器人接待买家数</td><td class="num">8,678</td><td class="num">8,754</td><td class="num highlight">10,202</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>机器人接待转化率</td><td class="num">18.78%</td><td class="num">18.71%</td><td class="num highlight">19.79%</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>机器人下单金额</td><td class="num">¥12.14万</td><td class="num">¥10.59万</td><td class="num highlight">¥13.22万</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>人工接待买家数</td><td class="num">8,677</td><td class="num">8,849</td><td class="num highlight">9,637</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工接待转化率</td><td class="num highlight">11.12%</td><td class="num">11.58%</td><td class="num">11.55%</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>人工下单金额</td><td class="num">¥7.22万</td><td class="num">¥6.53万</td><td class="num highlight">¥7.55万</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>响应买家问题数</td><td class="num">21,303</td><td class="num">22,555</td><td class="num highlight">23,988</td><td><span class="badge badge-excellent">持续增长</span></td></tr>
+<tr><td>人工平均响应时长</td><td class="num highlight">00:17:14</td><td class="num">00:26:41</td><td class="num">00:20:23</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>人工1分钟响应率</td><td class="num highlight">22.87%</td><td class="num">21.45%</td><td class="num">19.64%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>人工5分钟响应率</td><td class="num highlight">55.96%</td><td class="num">54.00%</td><td class="num">49.83%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>人工30分钟响应率</td><td class="num">86.22%</td><td class="num highlight">85.59%</td><td class="num">86.93%</td><td><span class="badge badge-good">基本稳定</span></td></tr>
+<tr><td>人工60分钟响应率</td><td class="num">94.49%</td><td class="num highlight">93.92%</td><td class="num">94.82%</td><td><span class="badge badge-good">基本稳定</span></td></tr>
+<tr><td>买家平均等待接待时长</td><td class="num">02:15:28</td><td class="num">02:16:26</td><td class="num highlight">02:06:29</td><td><span class="badge badge-good">改善</span></td></tr>
+<tr><td>买家咨询1分钟被接待率</td><td class="num highlight">18.24%</td><td class="num">16.33%</td><td class="num">15.08%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>买家咨询5分钟被接待率</td><td class="num highlight">44.40%</td><td class="num">42.92%</td><td class="num">42.04%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 订单与弃单 -->
+<div class="section">
+<div class="section-title">订单与弃单指标对比（5-7月）</div>
+<p class="section-note">口径：订单表、弃单表汇总数据</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>趋势</th></tr></thead>
+<tbody>
+<tr><td>总订单数</td><td class="num">238,260</td><td class="num">222,719</td><td class="num highlight">266,566</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>订单金额(人民币)</td><td class="num">¥1,061万</td><td class="num">¥968万</td><td class="num highlight">¥1,093万</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>非COD订单数</td><td class="num">58,973</td><td class="num">55,959</td><td class="num highlight">69,901</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>非COD付款率</td><td class="num highlight">92.39%</td><td class="num">92.02%</td><td class="num">91.70%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>确认订单数</td><td class="num">119,782</td><td class="num">110,579</td><td class="num highlight">126,724</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>确认后弃单数</td><td class="num highlight">18,230</td><td class="num">17,241</td><td class="num">17,770</td><td><span class="badge badge-good">基本稳定</span></td></tr>
+<tr><td>物流呵护覆盖率</td><td class="num">98.30%</td><td class="num">98.38%</td><td class="num highlight">98.36%</td><td><span class="badge badge-good">稳定</span></td></tr>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">取消订单（主要弃单类型）</td></tr>
+<tr><td>&nbsp;&nbsp;弃单数</td><td class="num">38,277</td><td class="num highlight">36,739</td><td class="num">42,567</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;最终弃单率</td><td class="num">11.88%</td><td class="num">12.17%</td><td class="num highlight">11.62%</td><td><span class="badge badge-good">改善</span></td></tr>
+<tr><td>&nbsp;&nbsp;弃单挽回率</td><td class="num">4.11%</td><td class="num highlight">4.18%</td><td class="num">4.14%</td><td><span class="badge badge-neutral">持平</span></td></tr>
+<tr><td>&nbsp;&nbsp;弃单沟通率</td><td class="num highlight">85.62%</td><td class="num">84.50%</td><td class="num">82.10%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td>&nbsp;&nbsp;沟通后挽回率</td><td class="num">25.68%</td><td class="num highlight">25.61%</td><td class="num">26.94%</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 非COD催付 -->
+<div class="section">
+<div class="section-title">非COD催付情况（5-7月）</div>
+<p class="section-note">口径：催付款配置的执行时间对应数据</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>指标</th><th>5月</th><th>6月</th><th>7月</th><th>趋势</th></tr></thead>
+<tbody>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">2分钟执行时间</td></tr>
+<tr><td>&nbsp;&nbsp;未付款订单数</td><td class="num">4,984</td><td class="num highlight">4,403</td><td class="num">5,806</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;催付后付款率</td><td class="num highlight">44.98%</td><td class="num">38.63%</td><td class="num">39.07%</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;催付覆盖率</td><td class="num highlight">92.44%</td><td class="num">91.85%</td><td class="num">88.91%</td><td><span class="badge badge-danger">持续下降</span></td></tr>
+<tr><td colspan="5" style="font-weight:700;background:#f7f8fa;color:#667eea;text-align:left">5分钟执行时间</td></tr>
+<tr><td>&nbsp;&nbsp;未付款订单数</td><td class="num">646</td><td class="num highlight">594</td><td class="num">847</td><td><span class="badge badge-warning">波动</span></td></tr>
+<tr><td>&nbsp;&nbsp;催付后付款率</td><td class="num highlight">22.20%</td><td class="num">20.44%</td><td class="num">26.86%</td><td><span class="badge badge-excellent">整体增长</span></td></tr>
+<tr><td>&nbsp;&nbsp;催付覆盖率</td><td class="num highlight">89.94%</td><td class="num">92.26%</td><td class="num">90.55%</td><td><span class="badge badge-warning">波动</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 客服账号响应指标对比 -->
+<div class="section">
+<div class="section-title">客服账号响应指标对比（5-7月）</div>
+<p class="section-note">口径：人工接待后下单买家数、人工接待转化率、人工接待平均响应时长、人工5分钟响应率（Metabase客服维度表）</p>
+<div class="table-wrap">
+<table class="comparison-table">
+<thead><tr><th>客服账号</th><th>5月接待</th><th>5月转化率</th><th>5月响应</th><th>5月5分钟率</th><th>6月接待</th><th>6月转化率</th><th>6月响应</th><th>6月5分钟率</th><th>7月接待</th><th>7月转化率</th><th>7月响应</th><th>7月5分钟率</th></tr></thead>
+<tbody>
+<tr><td>ELLA0911</td><td class="num">4,200</td><td class="num">11.19%</td><td class="num">00:12:39</td><td class="num">51.16%</td><td class="num">4,615</td><td class="num">12.03%</td><td class="num">00:14:17</td><td class="num">51.78%</td><td class="num highlight">4,657</td><td class="num highlight">12.35%</td><td class="num">00:13:23</td><td class="num">53.14%</td></tr>
+<tr><td>Anne1023</td><td class="num">2,307</td><td class="num">9.58%</td><td class="num">00:13:45</td><td class="num">58.88%</td><td class="num">2,388</td><td class="num">11.35%</td><td class="num">00:17:26</td><td class="num">56.33%</td><td class="num highlight">2,609</td><td class="num">10.50%</td><td class="num">00:18:14</td><td class="num">53.79%</td></tr>
+<tr><td>chenyan</td><td class="num">1,147</td><td class="num highlight">13.43%</td><td class="num highlight">00:12:41</td><td class="num highlight">62.87%</td><td class="num">704</td><td class="num">14.06%</td><td class="num">00:10:21</td><td class="num">56.59%</td><td class="num">1,078</td><td class="num">12.52%</td><td class="num">00:10:03</td><td class="num">54.57%</td></tr>
+<tr><td>TikTok-CS</td><td class="num">657</td><td class="num">10.35%</td><td class="num">00:17:18</td><td class="num">40.49%</td><td class="num">624</td><td class="num">9.13%</td><td class="num">00:22:42</td><td class="num">30.37%</td><td class="num highlight">584</td><td class="num">9.25%</td><td class="num">00:17:53</td><td class="num">37.15%</td></tr>
+<tr><td>非乐聊帐号</td><td class="num">11</td><td class="num">9.09%</td><td class="num">00:02:20</td><td class="num">83.33%</td><td class="num">11</td><td class="num">9.09%</td><td class="num">00:15:41</td><td class="num">50.00%</td><td class="num">33</td><td class="num">9.09%</td><td class="num">02:27:09</td><td class="num">50.00%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 客服账号六边形能力图 -->
+<div class="section">
+<div class="section-title">客服账号六边形能力图（7月数据）</div>
+<p class="section-note">维度：人工5分钟响应率 | 转化率 | 人工平均响应时间 | 接待量 | 买家5分钟被接待率 | 人工1分钟响应率</p>
+<div class="radar-grid" id="agentRadarGrid"></div>
+</div>
+
+<!-- 客服账号两两对比 -->
+<div class="comparison-section">
+<div class="section-title">客服账号两两对比</div>
+<div class="comparison-header">
+<select id="selectAgent1" class="comparison-select"><option value="">选择客服账号1</option></select>
+<span style="font-size:16px;color:#999">VS</span>
+<select id="selectAgent2" class="comparison-select"><option value="">选择客服账号2</option></select>
+<button class="comparison-btn" onclick="compareAgents()">对比</button>
+</div>
+<div id="agentComparisonResult" style="display:none">
+<div class="comparison-radar-container"><canvas id="agentComparisonRadar"></canvas></div>
+<div class="comparison-legend">
+<div class="legend-item"><div class="legend-color" style="background:#667eea"></div><span id="agent1Legend">账号1</span></div>
+<div class="legend-item"><div class="legend-color" style="background:#ff4d4f"></div><span id="agent2Legend">账号2</span></div>
+</div>
+<div id="agentComparisonDiff"></div>
+</div>
+</div>
+
+<div class="footer">数据来源：乐聊Metabase客服健康指标仪表盘 · 韬鸣 · 更新时间 2026-08-24</div>
+</div>
+
+<script>
+const agentData=[
+{name:'ELLA0911',department:'客服部:菲律宾白班客服',volume:4657,overall5m:53.14,conversion:12.35,overallAvgResponse:803,reception5m:46.51,resp1m:19.42},
+{name:'Anne1023',department:'客服部:菲律宾客服晚班',volume:2609,overall5m:53.79,conversion:10.50,overallAvgResponse:1094,reception5m:44.01,resp1m:23.97},
+{name:'chenyan',department:'客服部:chenyan230731',volume:1078,overall5m:54.57,conversion:12.52,overallAvgResponse:603,reception5m:45.16,resp1m:20.66},
+{name:'TikTok-CS',department:'TikTok:客服',volume:584,overall5m:37.15,conversion:9.25,overallAvgResponse:1073,reception5m:28.05,resp1m:9.69}
+];
+
+let chartInstances=[];
+function destroyAll(){chartInstances.forEach(c=>{try{c.destroy()}catch(e){}});chartInstances=[]}
+
+function getRadarData(a){
+return{
+labels:['5分钟响应率','转化率','平均响应时间','接待量','5分钟被接待率','1分钟响应率'],
+values:[
+{value:a.overall5m,unit:'%'},
+{value:a.conversion,unit:'%'},
+{value:(a.overallAvgResponse/60).toFixed(0),unit:'min'},
+{value:a.volume,unit:''},
+{value:a.reception5m,unit:'%'},
+{value:a.resp1m,unit:'%'}
+],
+normalized:[
+Math.min(100,Math.max(0,(a.overall5m-10)*1.1)),
+a.conversion*5,
+Math.max(0,100-a.overallAvgResponse/120),
+Math.min(100,a.volume/200),
+Math.min(100,Math.max(0,(a.reception5m-10)*1.1)),
+Math.min(100,Math.max(0,(a.resp1m-5)*1.1))
+]};
+}
+
+function generateRadar(){
+var grid=document.getElementById('agentRadarGrid');
+grid.innerHTML='';
+var colors=['#667eea','#52c41a','#1890ff','#faad14'];
+agentData.forEach(function(a,i){
+var card=document.createElement('div');
+card.className='radar-card';
+var id='ar-'+i;
+card.innerHTML='<h4>'+a.name+'</h4><canvas id="'+id+'" height="240"></canvas>';
+grid.appendChild(card);
+});
+setTimeout(function(){
+agentData.forEach(function(a,i){
+var id='ar-'+i;
+var canvas=document.getElementById(id);
+if(!canvas)return;
+var ctx=canvas.getContext('2d');
+var norm=[
+Math.min(100,Math.max(0,(a.overall5m-10)*1.1)),
+a.conversion*5,
+Math.max(0,100-a.overallAvgResponse/120),
+Math.min(100,a.volume/200),
+Math.min(100,Math.max(0,(a.reception5m-10)*1.1)),
+Math.min(100,Math.max(0,(a.resp1m-5)*1.1))
+];
+new Chart(ctx,{
+type:'radar',
+data:{
+labels:['5分钟响应率','转化率','平均响应时间','接待量','5分钟被接待率','1分钟响应率'],
+datasets:[{data:norm,backgroundColor:colors[i]+'33',borderColor:colors[i],borderWidth:2,pointBackgroundColor:colors[i],pointRadius:3}]
+},
+options:{responsive:true,scales:{r:{beginAtZero:true,max:100,ticks:{display:false},grid:{color:'#e8e8e8'},pointLabels:{font:{size:10}}}},plugins:{legend:{display:false}}}
+});
+});
+},200);
+var s1=document.getElementById('selectAgent1');
+var s2=document.getElementById('selectAgent2');
+s1.innerHTML='<option value="">选择客服账号1</option>';
+s2.innerHTML='<option value="">选择客服账号2</option>';
+agentData.forEach(function(a,i){s1.innerHTML+='<option value="'+i+'">'+a.name+'</option>';s2.innerHTML+='<option value="'+i+'">'+a.name+'</option>'});
+}
+
+let cmpChart=null;
+function compareAgents(){
+var i1=document.getElementById('selectAgent1').value;
+var i2=document.getElementById('selectAgent2').value;
+if(i1===''||i2===''||i1===i2){alert('请选择两个不同的客服账号');return}
+var a1=agentData[i1],a2=agentData[i2];
+var d1=getRadarData(a1),d2=getRadarData(a2);
+if(cmpChart){cmpChart.destroy();cmpChart=null}
+var canvas=document.getElementById('agentComparisonRadar');
+cmpChart=new Chart(canvas.getContext('2d'),{
+type:'radar',
+data:{labels:d1.labels,datasets:[
+{label:a1.name,data:d1.normalized,backgroundColor:'#667eea33',borderColor:'#667eea',borderWidth:2,pointBackgroundColor:'#667eea'},
+{label:a2.name,data:d2.normalized,backgroundColor:'#ff4d4f33',borderColor:'#ff4d4f',borderWidth:2,pointBackgroundColor:'#ff4d4f'}
+]},
+options:{responsive:true,scales:{r:{beginAtZero:true,max:100,ticks:{display:false},grid:{color:'#e8e8e8'},pointLabels:{font:{size:11}}}},plugins:{legend:{display:false}}}
+});
+document.getElementById('agent1Legend').textContent=a1.name;
+document.getElementById('agent2Legend').textContent=a2.name;
+document.getElementById('agentComparisonResult').style.display='block';
+var h='<table class="diff-table"><thead><tr><th>指标</th><th>'+a1.name+'</th><th>'+a2.name+'</th><th>差异</th></tr></thead><tbody>';
+d1.labels.forEach(function(l,j){
+var v1=d1.values[j],v2=d2.values[j];
+var diff=v2.value-v1.value;
+var dt=v1.unit===''?(diff>0?'+':'')+diff.toLocaleString():(diff>0?'+':'')+diff.toFixed(2)+v1.unit;
+h+='<tr><td>'+l+'</td><td>'+v1.value+v1.unit+'</td><td>'+v2.value+v2.unit+'</td><td>'+dt+'</td></tr>';
+});
+h+='</tbody></table>';
+document.getElementById('agentComparisonDiff').innerHTML=h;
+}
+
+generateRadar();
+</script>
+</body>
+</html>
