@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客服表现数据看板 - 霹雳爸爸 - 6-7-8月 - 按国家</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;display:flex;flex-direction:column}
+.bar{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:0 0 auto}
+.bar h1{font-size:16px;font-weight:600;margin-right:8px;white-space:nowrap}
+.bar .sub{font-size:12px;opacity:.72;margin-right:12px;white-space:nowrap}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;font-size:13px;cursor:pointer;transition:.15s;font-family:inherit}
+.tab:hover{background:rgba(255,255,255,.2)}
+.tab.active{background:#fff;color:#1a1a2e;font-weight:600;border-color:#fff}
+.tip{font-size:12px;opacity:.6;margin-left:auto;white-space:nowrap}
+iframe{flex:1 1 auto;width:100%;border:0;background:#f0f2f5}
+</style>
+</head>
+<body>
+<div class="bar">
+<h1>客服表现数据看板 · 按国家</h1>
+<span class="sub">龙岩市霹雳爸爸电子商务有限公司（org_id=6659） · 6-7-8月</span>
+<div class="tabs">
+    <button class="tab active" data-file="dashboard_pilibaba_6659_all.html">合计（全部国家）</button>
+    <button class="tab" data-file="dashboard_pilibaba_6659_th.html">泰国 TH</button>
+    <button class="tab" data-file="dashboard_pilibaba_6659_my.html">马来西亚 MY</button>
+    <button class="tab" data-file="dashboard_pilibaba_6659_id.html">印尼 ID</button>
+    <button class="tab" data-file="dashboard_pilibaba_6659_ph.html">菲律宾 PH</button>
+    <button class="tab" data-file="dashboard_pilibaba_6659_vn.html">越南 VN</button>
+    <button class="tab" data-file="dashboard_pilibaba_6659_sg.html">新加坡 SG</button>
+</div>
+<span class="tip">点击国家切换</span>
+</div>
+<iframe id="frame" src="dashboard_pilibaba_6659_all.html"></iframe>
+<script>
+var frame=document.getElementById('frame');
+document.querySelectorAll('.tab').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    frame.src=b.getAttribute('data-file');
+  });
+});
+</script>
+</body>
+</html>
