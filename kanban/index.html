@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客服表现数据看板 · 2026年6-8月</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:32px 40px}
+.header h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.header p{font-size:14px;opacity:.88}
+.container{max-width:1200px;margin:0 auto;padding:28px 24px 60px}
+.section-title{font-size:17px;font-weight:700;color:#1a1a2e;margin:30px 0 16px;padding-left:12px;border-left:4px solid #667eea}
+.section-title:first-child{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:.2s;display:flex;flex-direction:column;text-decoration:none;color:inherit;border:1px solid transparent}
+.card:hover{box-shadow:0 6px 18px rgba(102,126,234,.18);border-color:#d9dffb;transform:translateY(-1px)}
+.card .name{font-size:17px;font-weight:700;margin-bottom:6px}
+.card .meta{font-size:12px;color:#8a8f9c;margin-bottom:14px;line-height:1.6}
+.card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;background:#eef1fd;color:#5a67c9;font-weight:600}
+.tag.gray{background:#f2f3f5;color:#8a8f9c}
+.tag.green{background:#e8f7ee;color:#2f9e5c}
+.card .go{margin-top:auto;font-size:13px;font-weight:600;color:#667eea}
+.mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.mini a{font-size:12px;padding:5px 11px;border-radius:8px;background:#f5f6fa;color:#4b5563;text-decoration:none;border:1px solid #e8eaef;transition:.15s}
+.mini a:hover{background:#667eea;color:#fff;border-color:#667eea}
+.footer{text-align:center;padding:28px;color:#9aa0ad;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>客服表现数据看板</h1>
+  <p>2026年6月 - 8月 · 数据来源：乐聊 Metabase 客户健康指标</p>
+</div>
+
+<div class="container">
+
+  <div class="section-title">客户看板（6-8月）</div>
+  <div class="grid" id="grid">
+    <a class="card" href="dashboard_zhongqi_1156.html">
+      <div class="name">众齐</div>
+      <div class="meta">org_id = 1156</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">2 个客服账号</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_zhongqi_2677.html">
+      <div class="name">众齐</div>
+      <div class="meta">org_id = 2677</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">5 个客服账号</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_zhongqi_jiawei_46002.html">
+      <div class="name">众齐（嘉伟）</div>
+      <div class="meta">org_id = 46002</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">5 个客服账号</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_chuangtai_1724.html">
+      <div class="name">创泰</div>
+      <div class="meta">org_id = 1724</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">6 个客服账号</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_xunyu_2571.html">
+      <div class="name">厦门迅宇</div>
+      <div class="meta">org_id = 2571</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">1 个客服账号</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_yuelaizhiyuan_7863.html">
+      <div class="name">悦来致远</div>
+      <div class="meta">org_id = 7863</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">3 个客服账号</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_tanxi_26494.html">
+      <div class="name">檀玺</div>
+      <div class="meta">org_id = 26494</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">6 个客服账号</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659.html">
+      <div class="name">龙岩市霹雳爸爸电子商务有限公司</div>
+      <div class="meta">org_id = 6659 · 含各站点对比</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag green">单文件 8 视图</span><span class="tag gray">TH/MY/ID/PH/VN/SG</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+  </div>
+
+  <div class="section-title">霹雳爸爸 · 按站点拆分（可选，内容已包含在上方单文件内）</div>
+  <div class="grid">
+    <a class="card" href="dashboard_pilibaba_6659_all.html">
+      <div class="name">全部站点 · 合计</div>
+      <div class="meta">org_id = 6659</div>
+      <div class="tags"><span class="tag">6-7-8月</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659_bysite.html">
+      <div class="name">按国家切换页（旧版入口）</div>
+      <div class="meta">顶部按钮在 6 个国家之间切换</div>
+      <div class="tags"><span class="tag">6-7-8月</span><span class="tag gray">独立文件</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659_th.html">
+      <div class="name">泰国 TH</div>
+      <div class="meta">org_id = 6659</div>
+      <div class="tags"><span class="tag">6-7-8月</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659_my.html">
+      <div class="name">马来西亚 MY</div>
+      <div class="meta">org_id = 6659</div>
+      <div class="tags"><span class="tag">6-7-8月</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659_id.html">
+      <div class="name">印尼 ID</div>
+      <div class="meta">org_id = 6659</div>
+      <div class="tags"><span class="tag">6-7-8月</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659_ph.html">
+      <div class="name">菲律宾 PH</div>
+      <div class="meta">org_id = 6659</div>
+      <div class="tags"><span class="tag">6-7-8月</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659_vn.html">
+      <div class="name">越南 VN</div>
+      <div class="meta">org_id = 6659</div>
+      <div class="tags"><span class="tag">6-7-8月</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+    <a class="card" href="dashboard_pilibaba_6659_sg.html">
+      <div class="name">新加坡 SG</div>
+      <div class="meta">org_id = 6659</div>
+      <div class="tags"><span class="tag">6-7-8月</span></div>
+      <div class="go">打开看板 →</div>
+    </a>
+  </div>
+
+</div>
+
+<div class="footer">数据来源：乐聊 Metabase 客户健康指标仪表盘 · 更新于 2026-09-20</div>
+
+</body>
+</html>
