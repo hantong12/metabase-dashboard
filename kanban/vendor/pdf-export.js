@@ -291,7 +291,6 @@ function paginate(units,stage){
         u.rowH=Math.max(90,ph-u.prefixH-u.mb)+12;
       }
       u.rowCal=1;
-      if(window.__pdfTrace) window.__pdfTrace.push(['gridCal',Math.round(u.rowH),u.cards.length]);
     }
     var pi=0, ri=0, first=true, guard=0, done=false;
     while(!done&&guard++<900){
@@ -311,7 +310,6 @@ function paginate(units,stage){
         var h2=measureOne(p2.node,stage);
         if(h2<=rest+2||h2<h){ p=p2; h=h2; } else break;
       }
-      if(window.__pdfTrace) window.__pdfTrace.push(['u'+i,pi,ri,Math.round(rest),Math.round(h),Math.round(used)]);
       if(h>rest+4&&cur.length){
         flush();
         p=makePiece(u,pi,ri,CSS_PAGE_H,first,null,pi>0);
@@ -329,11 +327,6 @@ function paginate(units,stage){
     if(CSS_PAGE_H-used<12) flush();
   }
   flush();
-  try{
-    window.__pdfLog=log.map(function(v){ return Math.round(v); });
-    window.__pdfUnits=units.map(function(x){ return Math.round(x.h)+'|'+(x.kind||'-')+'|'+Math.round(x.mb)+'|'+Math.round(x.prefixH||0)+'|'+(x.parts?x.parts.length:0); });
-    window.__pdfCap=CSS_PAGE_H;
-  }catch(e){}
   return pages;
 }
 
@@ -345,12 +338,6 @@ async function renderPages(pages,pdf,stage){
     stage.innerHTML=''; stage.appendChild(box);
     await frame(); await wait(30);
     await paintCanvas(box);
-    if(window.__pdfTrace){
-      var fe=box.firstElementChild, ge=box.querySelector('.radar-grid'), cc=box.querySelector('.radar-card');
-      window.__pdfTrace.push(['pg'+i,Math.round(box.offsetWidth),Math.round(fe?fe.offsetWidth:0),Math.round(box.offsetHeight),
-        ge?Math.round(ge.offsetWidth):-1, cc?Math.round(cc.offsetWidth):-1,
-        ge?getComputedStyle(ge).gridTemplateColumns:'-']);
-    }
     var cv=await window.html2canvas(box,{
       scale:SCALE, backgroundColor:'#ffffff', useCORS:true, logging:false,
       width:STAGE_W, height:Math.max(1,box.offsetHeight),
@@ -365,10 +352,27 @@ async function renderPages(pages,pdf,stage){
   }
 }
 function pdfName(){
-  var t=(document.title||'').replace(/^\s*客服表现数据看板\s*-\s*/,'').trim();
-  if(t==='客服表现数据看板') t='';
-  t=t.replace(/\s+-\s+/g,'_').replace(/[\\/:*?"<>|]/g,'_');
-  return '客服表现看板'+(t?'_'+t:'')+'.pdf';
+  var name='', period='';
+  try{
+    var ut=document.querySelector('.header .update-time');
+    if(ut){
+      var m=/客户[:：]\s*([^\n]+)/.exec(ut.textContent||'');
+      if(m) name=m[1].replace(/\(?\s*org[._]?id\s*=\s*\d+\s*\)?/gi,'').replace(/\s+/g,' ').trim();
+    }
+    var p=document.querySelector('.header p')||document.querySelector('.header h1');
+    if(p){
+      var pm=/(\d+\s*-\s*\d+\s*月|\d+\s*月)/.exec(p.textContent||'');
+      if(pm) period=pm[1].replace(/\s+/g,'');
+    }
+  }catch(e){}
+  if(!name){
+    var t=(document.title||'').replace(/^\s*客服表现数据看板\s*-\s*/,'').trim();
+    if(t&&t!=='客服表现数据看板') name=t;
+  }
+  var s='客服表现看板';
+  if(name) s+='_'+name;
+  if(period) s+='_'+period;
+  return s.replace(/[\\/:*?"<>|]/g,'_').slice(0,120)+'.pdf';
 }
 function tipText(html,ms){
   if(!tip) return;
@@ -409,7 +413,6 @@ async function start(){
     await frame(); await wait(60);
 
     label('分页中…');
-    window.__pdfTrace=[];
     var units=[].slice.call(copy.children).map(function(el){
       var info=analyze(el); info.el=el; info.node=el; return info;
     });
