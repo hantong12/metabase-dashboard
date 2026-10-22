@@ -357,7 +357,7 @@ function pdfName(){
     var ut=document.querySelector('.header .update-time');
     if(ut){
       var m=/客户[:：]\s*([^\n]+)/.exec(ut.textContent||'');
-      if(m) name=m[1].replace(/\(?\s*org[._]?id\s*=\s*\d+\s*\)?/gi,'').replace(/\s+/g,' ').trim();
+      if(m) name=m[1].replace(/[（(]?\s*org[._]?id\s*=\s*\d+\s*[）)]?/gi,'').replace(/[（(]\s*[）)]/g,'').replace(/\s+/g,' ').trim();
     }
     var p=document.querySelector('.header p')||document.querySelector('.header h1');
     if(p){
